@@ -1,6 +1,16 @@
+package xxlilchatxx;
 import java.util.Scanner;
 
+/**
+ * Entry point for the XxLilChatxX chatbot application.
+ * Handles user commands to add, list, mark, and unmark tasks.
+ */
 public class XxLilChatxX {
+    /**
+     * Runs the chatbot, reading commands from standard input until "bye" is entered.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         String banner =
                 "██╗  ██╗██╗  ██╗██╗     ██╗██╗      ██████╗██╗  ██╗ █████╗ ████████╗██╗  ██╗██╗  ██╗\n"
@@ -44,7 +54,7 @@ public class XxLilChatxX {
                 System.out.println("OK, I've marked this task as not done yet:");
                 System.out.println("  " + tasks[index]);
                 System.out.println("____________________________________________________________");
-        } else {
+            } else {
                 tasks[taskCount] = new Task(input);
                 taskCount++;
                 System.out.println("____________________________________________________________");
