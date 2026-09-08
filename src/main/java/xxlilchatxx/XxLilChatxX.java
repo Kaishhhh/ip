@@ -36,46 +36,82 @@ public class XxLilChatxX {
 
             if (input.equals("bye")) {
                 break;
-            } else if (input.equals("list")) {
-                System.out.println("____________________________________________________________");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + "." + tasks[i]);
+            }
+
+            try {
+                if (input.equals("list")) {
+                    System.out.println("____________________________________________________________");
+                    for (int i = 0; i < taskCount; i++) {
+                        System.out.println((i + 1) + "." + tasks[i]);
+                    }
+                    System.out.println("____________________________________________________________");
+                } else if (input.startsWith("mark ")) {
+                    int index = Integer.parseInt(input.substring(5)) - 1;
+                    if (index < 0 || index >= taskCount) {
+                        throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
+                    }
+                    tasks[index].markAsDone();
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println("  " + tasks[index]);
+                    System.out.println("____________________________________________________________");
+                } else if (input.startsWith("unmark ")) {
+                    int index = Integer.parseInt(input.substring(7)) - 1;
+                    if (index < 0 || index >= taskCount) {
+                        throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
+                    }
+                    tasks[index].markAsNotDone();
+                    System.out.println("____________________________________________________________");
+                    System.out.println("OK, I've marked this task as not done yet:");
+                    System.out.println("  " + tasks[index]);
+                    System.out.println("____________________________________________________________");
+                } else if (input.equals("todo") || input.startsWith("todo ")) {
+                    String desc = input.length() > 4 ? input.substring(5).trim() : "";
+                    if (desc.isEmpty()) {
+                        throw new XxLilChatxXException("OOPS!!! The description of a todo cannot be empty.");
+                    }
+                    Task t = new Todo(desc);
+                    tasks[taskCount++] = t;
+                    printAdded(t, taskCount);
+                } else if (input.equals("deadline") || input.startsWith("deadline ")) {
+                    String rest = input.length() > 8 ? input.substring(9).trim() : "";
+                    String[] parts = rest.split(" /by ");
+                    if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                        throw new XxLilChatxXException(
+                                "OOPS!!! A deadline needs a description and a /by date, e.g. deadline return book /by Sunday");
+                    }
+                    Task t = new Deadline(parts[0], parts[1]);
+                    tasks[taskCount++] = t;
+                    printAdded(t, taskCount);
+                } else if (input.equals("event") || input.startsWith("event ")) {
+                    String rest = input.length() > 5 ? input.substring(6).trim() : "";
+                    String[] parts = rest.split(" /from ");
+                    if (parts.length < 2 || parts[0].trim().isEmpty()) {
+                        throw new XxLilChatxXException(
+                                "OOPS!!! An event needs a description, /from time, and /to time.");
+                    }
+                    String[] timeParts = parts[1].split(" /to ");
+                    if (timeParts.length < 2) {
+                        throw new XxLilChatxXException(
+                                "OOPS!!! An event needs both a /from time and a /to time.");
+                    }
+                    Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
+                    tasks[taskCount++] = t;
+                    printAdded(t, taskCount);
+                } else {
+                    throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
+            } catch (XxLilChatxXException e) {
                 System.out.println("____________________________________________________________");
-            } else if (input.startsWith("mark ")) {
-                int index = Integer.parseInt(input.substring(5)) - 1;
-                tasks[index].markAsDone();
+                System.out.println(e.getMessage());
                 System.out.println("____________________________________________________________");
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  " + tasks[index]);
+            } catch (NumberFormatException e) {
                 System.out.println("____________________________________________________________");
-            } else if (input.startsWith("unmark ")) {
-                int index = Integer.parseInt(input.substring(7)) - 1;
-                tasks[index].markAsNotDone();
+                System.out.println("OOPS!!! Please provide a valid task number.");
                 System.out.println("____________________________________________________________");
-                System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("  " + tasks[index]);
+            } catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("____________________________________________________________");
-            } else if (input.startsWith("todo ")) {
-                String desc = input.substring(5);
-                Task t = new Todo(desc);
-                tasks[taskCount++] = t;
-                printAdded(t, taskCount);
-            } else if (input.startsWith("deadline ")) {
-                String[] parts = input.substring(9).split(" /by ");
-                Task t = new Deadline(parts[0], parts[1]);
-                tasks[taskCount++] = t;
-                printAdded(t, taskCount);
-            } else if (input.startsWith("event ")) {
-                String[] parts = input.substring(6).split(" /from ");
-                String desc = parts[0];
-                String[] timeParts = parts[1].split(" /to ");
-                Task t = new Event(desc, timeParts[0], timeParts[1]);
-                tasks[taskCount++] = t;
-                printAdded(t, taskCount);
-            } else {
-                System.out.println("____________________________________________________________");
-                System.out.println("I'm sorry, I don't understand that command.");
+                System.out.println("OOPS!!! That task number doesn't exist.");
                 System.out.println("____________________________________________________________");
             }
         }
@@ -87,7 +123,7 @@ public class XxLilChatxX {
     /**
      * Prints the confirmation message after a task has been added.
      *
-     * @param task The task that was added.
+     * @param task  The task that was added.
      * @param count The total number of tasks after adding.
      */
     private static void printAdded(Task task, int count) {
