@@ -1,5 +1,6 @@
 package xxlilchatxx;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -27,8 +28,7 @@ public class XxLilChatxX {
         System.out.println("What can I do for you?");
         System.out.println("____________________________________________________________");
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -41,29 +41,40 @@ public class XxLilChatxX {
             try {
                 if (input.equals("list")) {
                     System.out.println("____________________________________________________________");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
                     System.out.println("____________________________________________________________");
                 } else if (input.startsWith("mark ")) {
                     int index = Integer.parseInt(input.substring(5)) - 1;
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
-                    tasks[index].markAsDone();
+                    tasks.get(index).markAsDone();
                     System.out.println("____________________________________________________________");
                     System.out.println("Nice! I've marked this task as done:");
-                    System.out.println("  " + tasks[index]);
+                    System.out.println("  " + tasks.get(index));
                     System.out.println("____________________________________________________________");
                 } else if (input.startsWith("unmark ")) {
                     int index = Integer.parseInt(input.substring(7)) - 1;
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
-                    tasks[index].markAsNotDone();
+                    tasks.get(index).markAsNotDone();
                     System.out.println("____________________________________________________________");
                     System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println("  " + tasks[index]);
+                    System.out.println("  " + tasks.get(index));
+                    System.out.println("____________________________________________________________");
+                } else if (input.startsWith("delete ")) {
+                    int index = Integer.parseInt(input.substring(7)) - 1;
+                    if (index < 0 || index >= tasks.size()) {
+                        throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
+                    }
+                    Task removed = tasks.remove(index);
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + removed);
+                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                     System.out.println("____________________________________________________________");
                 } else if (input.equals("todo") || input.startsWith("todo ")) {
                     String desc = input.length() > 4 ? input.substring(5).trim() : "";
@@ -71,8 +82,8 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! The description of a todo cannot be empty.");
                     }
                     Task t = new Todo(desc);
-                    tasks[taskCount++] = t;
-                    printAdded(t, taskCount);
+                    tasks.add(t);
+                    printAdded(t, tasks.size());
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
                     String rest = input.length() > 8 ? input.substring(9).trim() : "";
                     String[] parts = rest.split(" /by ");
@@ -81,8 +92,8 @@ public class XxLilChatxX {
                                 "OOPS!!! A deadline needs a description and a /by date, e.g. deadline return book /by Sunday");
                     }
                     Task t = new Deadline(parts[0], parts[1]);
-                    tasks[taskCount++] = t;
-                    printAdded(t, taskCount);
+                    tasks.add(t);
+                    printAdded(t, tasks.size());
                 } else if (input.equals("event") || input.startsWith("event ")) {
                     String rest = input.length() > 5 ? input.substring(6).trim() : "";
                     String[] parts = rest.split(" /from ");
@@ -96,8 +107,8 @@ public class XxLilChatxX {
                                 "OOPS!!! An event needs both a /from time and a /to time.");
                     }
                     Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
-                    tasks[taskCount++] = t;
-                    printAdded(t, taskCount);
+                    tasks.add(t);
+                    printAdded(t, tasks.size());
                 } else {
                     throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
@@ -108,10 +119,6 @@ public class XxLilChatxX {
             } catch (NumberFormatException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println("OOPS!!! Please provide a valid task number.");
-                System.out.println("____________________________________________________________");
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println("OOPS!!! That task number doesn't exist.");
                 System.out.println("____________________________________________________________");
             }
         }
