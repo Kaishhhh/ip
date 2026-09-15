@@ -1,0 +1,4 @@
+T | 1 | buy bread
+D | 0 | eat bread | friday
+E | 1 | throw bread | friday 2pm | 5pm
+T | 0 | do assignment

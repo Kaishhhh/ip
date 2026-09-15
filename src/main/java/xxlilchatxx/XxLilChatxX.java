@@ -29,6 +29,7 @@ public class XxLilChatxX {
         System.out.println("____________________________________________________________");
 
         ArrayList<Task> tasks = new ArrayList<>();
+        Storage.load(tasks);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -51,6 +52,7 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks.get(index).markAsDone();
+                    Storage.save(tasks);
                     System.out.println("____________________________________________________________");
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + tasks.get(index));
@@ -61,6 +63,7 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks.get(index).markAsNotDone();
+                    Storage.save(tasks);
                     System.out.println("____________________________________________________________");
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + tasks.get(index));
@@ -71,6 +74,7 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     Task removed = tasks.remove(index);
+                    Storage.save(tasks);
                     System.out.println("____________________________________________________________");
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("  " + removed);
@@ -83,6 +87,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Todo(desc);
                     tasks.add(t);
+                    Storage.save(tasks);
                     printAdded(t, tasks.size());
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
                     String rest = input.length() > 8 ? input.substring(9).trim() : "";
@@ -93,6 +98,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Deadline(parts[0], parts[1]);
                     tasks.add(t);
+                    Storage.save(tasks);
                     printAdded(t, tasks.size());
                 } else if (input.equals("event") || input.startsWith("event ")) {
                     String rest = input.length() > 5 ? input.substring(6).trim() : "";
@@ -108,6 +114,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
                     tasks.add(t);
+                    Storage.save(tasks);
                     printAdded(t, tasks.size());
                 } else {
                     throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");
