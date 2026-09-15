@@ -28,7 +28,7 @@ public class XxLilChatxX {
         System.out.println("____________________________________________________________");
 
         Task[] tasks = new Task[100];
-        int taskCount = 0;
+        int taskCount = Storage.load(tasks);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -51,6 +51,7 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks[index].markAsDone();
+                    Storage.save(tasks, taskCount);
                     System.out.println("____________________________________________________________");
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + tasks[index]);
@@ -61,6 +62,7 @@ public class XxLilChatxX {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks[index].markAsNotDone();
+                    Storage.save(tasks, taskCount);
                     System.out.println("____________________________________________________________");
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + tasks[index]);
@@ -72,6 +74,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Todo(desc);
                     tasks[taskCount++] = t;
+                    Storage.save(tasks, taskCount);
                     printAdded(t, taskCount);
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
                     String rest = input.length() > 8 ? input.substring(9).trim() : "";
@@ -82,6 +85,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Deadline(parts[0], parts[1]);
                     tasks[taskCount++] = t;
+                    Storage.save(tasks, taskCount);
                     printAdded(t, taskCount);
                 } else if (input.equals("event") || input.startsWith("event ")) {
                     String rest = input.length() > 5 ? input.substring(6).trim() : "";
@@ -97,6 +101,7 @@ public class XxLilChatxX {
                     }
                     Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
                     tasks[taskCount++] = t;
+                    Storage.save(tasks, taskCount);
                     printAdded(t, taskCount);
                 } else {
                     throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");

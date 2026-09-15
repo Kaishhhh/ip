@@ -39,6 +39,15 @@ public class Task {
         return description;
     }
 
+    /**
+     * Returns a representation of this task's completion status for file storage.
+     *
+     * @return "1" if the task is done, "0" otherwise.
+     */
+    public String toFileFormat() {
+        return isDone ? "1" : "0";
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
