@@ -23,21 +23,24 @@ public class XxLilChatxX {
 
         while (true) {
             String input = ui.readCommand();
+            Parser.CommandType type = Parser.parseCommandType(input);
 
-            if (input.equals("bye")) {
+            if (type == Parser.CommandType.BYE) {
                 break;
             }
 
             try {
-                if (input.equals("list")) {
-                    ui.showLine();
-                    for (int i = 0; i < tasks.size(); i++) {
+                switch (type) {
+                    case LIST:
+                        ui.showLine();
+                        for (int i = 0; i < tasks.size(); i++) {
                         System.out.println((i + 1) + "." + tasks.get(i));
-                    }
-                    ui.showLine();
-                } else if (input.startsWith("mark ")) {
-                    int index = Integer.parseInt(input.substring(5)) - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                        }
+                        ui.showLine();
+                        break;
+                    case MARK: {
+                    int index = Parser.parseIndex(input, 5);
+                    if (!tasks.isValidIndex(index)) {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks.get(index).markAsDone();
@@ -46,9 +49,11 @@ public class XxLilChatxX {
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + tasks.get(index));
                     ui.showLine();
-                } else if (input.startsWith("unmark ")) {
-                    int index = Integer.parseInt(input.substring(7)) - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                    break;
+                }
+                case UNMARK: {
+                    int index = Parser.parseIndex(input, 7);
+                    if (!tasks.isValidIndex(index)) {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     tasks.get(index).markAsNotDone();
@@ -57,9 +62,11 @@ public class XxLilChatxX {
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + tasks.get(index));
                     ui.showLine();
-                } else if (input.startsWith("delete ")) {
-                    int index = Integer.parseInt(input.substring(7)) - 1;
-                    if (index < 0 || index >= tasks.size()) {
+                    break;
+                }
+                case DELETE: {
+                    int index = Parser.parseIndex(input, 7);
+                    if (!tasks.isValidIndex(index)) {
                         throw new XxLilChatxXException("OOPS!!! That task number doesn't exist.");
                     }
                     Task removed = tasks.delete(index);
@@ -69,8 +76,10 @@ public class XxLilChatxX {
                     System.out.println("  " + removed);
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                     ui.showLine();
-                } else if (input.equals("todo") || input.startsWith("todo ")) {
-                    String desc = input.length() > 4 ? input.substring(5).trim() : "";
+                    break;
+                }
+                case TODO: {
+                    String desc = Parser.parseTodoDescription(input);
                     if (desc.isEmpty()) {
                         throw new XxLilChatxXException("OOPS!!! The description of a todo cannot be empty.");
                     }
@@ -78,10 +87,11 @@ public class XxLilChatxX {
                     tasks.add(t);
                     Storage.save(tasks.getTasks());
                     printAdded(ui, t, tasks.size());
-                } else if (input.equals("deadline") || input.startsWith("deadline ")) {
-                    String rest = input.length() > 8 ? input.substring(9).trim() : "";
-                    String[] parts = rest.split(" /by ");
-                    if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                    break;
+                }
+                case DEADLINE: {
+                    String[] parts = Parser.parseDeadlineParts(input);
+                    if (parts[0].isEmpty() || parts[1].isEmpty()) {
                         throw new XxLilChatxXException(
                                 "OOPS!!! A deadline needs a description and a /by date, e.g. deadline return book /by Sunday");
                     }
@@ -89,23 +99,21 @@ public class XxLilChatxX {
                     tasks.add(t);
                     Storage.save(tasks.getTasks());
                     printAdded(ui, t, tasks.size());
-                } else if (input.equals("event") || input.startsWith("event ")) {
-                    String rest = input.length() > 5 ? input.substring(6).trim() : "";
-                    String[] parts = rest.split(" /from ");
-                    if (parts.length < 2 || parts[0].trim().isEmpty()) {
+                    break;
+                }
+                case EVENT: {
+                    String[] parts = Parser.parseEventParts(input);
+                    if (parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
                         throw new XxLilChatxXException(
                                 "OOPS!!! An event needs a description, /from time, and /to time.");
                     }
-                    String[] timeParts = parts[1].split(" /to ");
-                    if (timeParts.length < 2) {
-                        throw new XxLilChatxXException(
-                                "OOPS!!! An event needs both a /from time and a /to time.");
-                    }
-                    Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
+                    Task t = new Event(parts[0], parts[1], parts[2]);
                     tasks.add(t);
                     Storage.save(tasks.getTasks());
                     printAdded(ui, t, tasks.size());
-                } else {
+                    break;
+                }
+                default:
                     throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
             } catch (XxLilChatxXException e) {
