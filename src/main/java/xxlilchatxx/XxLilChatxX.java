@@ -15,25 +15,14 @@ public class XxLilChatxX {
      * @param args Command-line arguments (not used).
      */
     public static void main(String[] args) {
-        String banner =
-                "██╗  ██╗██╗  ██╗██╗     ██╗██╗      ██████╗██╗  ██╗ █████╗ ████████╗██╗  ██╗██╗  ██╗\n"
-                        + "╚██╗██╔╝╚██╗██╔╝██║     ██║██║     ██╔════╝██║  ██║██╔══██╗╚══██╔══╝╚██╗██╔╝╚██╗██╔╝\n"
-                        + " ╚███╔╝  ╚███╔╝ ██║     ██║██║     ██║     ███████║███████║   ██║    ╚███╔╝  ╚███╔╝ \n"
-                        + " ██╔██╗  ██╔██╗ ██║     ██║██║     ██║     ██╔══██║██╔══██║   ██║    ██╔██╗  ██╔██╗ \n"
-                        + "██╔╝ ██╗██╔╝ ██╗███████╗██║███████╗╚██████╗██║  ██║██║  ██║   ██║   ██╔╝ ██╗██╔╝ ██╗\n"
-                        + "╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝\n";
-        System.out.println("____________________________________________________________");
-        System.out.println(banner);
-        System.out.println("Hello! I'm XxLilChatxX.");
-        System.out.println("What can I do for you?");
-        System.out.println("____________________________________________________________");
-
+        Ui ui = new Ui();
         ArrayList<Task> tasks = new ArrayList<>();
         Storage.load(tasks);
 
-        Scanner scanner = new Scanner(System.in);
+        ui.showWelcome();
+
         while (true) {
-            String input = scanner.nextLine();
+            String input = ui.readCommand();
 
             if (input.equals("bye")) {
                 break;
@@ -41,11 +30,11 @@ public class XxLilChatxX {
 
             try {
                 if (input.equals("list")) {
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println((i + 1) + "." + tasks.get(i));
                     }
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                 } else if (input.startsWith("mark ")) {
                     int index = Integer.parseInt(input.substring(5)) - 1;
                     if (index < 0 || index >= tasks.size()) {
@@ -53,10 +42,10 @@ public class XxLilChatxX {
                     }
                     tasks.get(index).markAsDone();
                     Storage.save(tasks);
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + tasks.get(index));
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                 } else if (input.startsWith("unmark ")) {
                     int index = Integer.parseInt(input.substring(7)) - 1;
                     if (index < 0 || index >= tasks.size()) {
@@ -64,10 +53,10 @@ public class XxLilChatxX {
                     }
                     tasks.get(index).markAsNotDone();
                     Storage.save(tasks);
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + tasks.get(index));
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                 } else if (input.startsWith("delete ")) {
                     int index = Integer.parseInt(input.substring(7)) - 1;
                     if (index < 0 || index >= tasks.size()) {
@@ -75,11 +64,11 @@ public class XxLilChatxX {
                     }
                     Task removed = tasks.remove(index);
                     Storage.save(tasks);
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("  " + removed);
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                    System.out.println("____________________________________________________________");
+                    ui.showLine();
                 } else if (input.equals("todo") || input.startsWith("todo ")) {
                     String desc = input.length() > 4 ? input.substring(5).trim() : "";
                     if (desc.isEmpty()) {
@@ -88,7 +77,7 @@ public class XxLilChatxX {
                     Task t = new Todo(desc);
                     tasks.add(t);
                     Storage.save(tasks);
-                    printAdded(t, tasks.size());
+                    printAdded(ui, t, tasks.size());
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
                     String rest = input.length() > 8 ? input.substring(9).trim() : "";
                     String[] parts = rest.split(" /by ");
@@ -99,7 +88,7 @@ public class XxLilChatxX {
                     Task t = new Deadline(parts[0], parts[1]);
                     tasks.add(t);
                     Storage.save(tasks);
-                    printAdded(t, tasks.size());
+                    printAdded(ui, t, tasks.size());
                 } else if (input.equals("event") || input.startsWith("event ")) {
                     String rest = input.length() > 5 ? input.substring(6).trim() : "";
                     String[] parts = rest.split(" /from ");
@@ -115,23 +104,22 @@ public class XxLilChatxX {
                     Task t = new Event(parts[0].trim(), timeParts[0], timeParts[1]);
                     tasks.add(t);
                     Storage.save(tasks);
-                    printAdded(t, tasks.size());
+                    printAdded(ui, t, tasks.size());
                 } else {
                     throw new XxLilChatxXException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
             } catch (XxLilChatxXException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println(e.getMessage());
-                System.out.println("____________________________________________________________");
+                ui.showLine();
+                ui.showError(e.getMessage());
+                ui.showLine();
             } catch (NumberFormatException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println("OOPS!!! Please provide a valid task number.");
-                System.out.println("____________________________________________________________");
+                ui.showLine();
+                ui.showError("OOPS!!! Please provide a valid task number.");
+                ui.showLine();
             }
         }
 
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println("____________________________________________________________");
+        ui.showGoodbye();
     }
 
     /**
@@ -140,11 +128,11 @@ public class XxLilChatxX {
      * @param task  The task that was added.
      * @param count The total number of tasks after adding.
      */
-    private static void printAdded(Task task, int count) {
-        System.out.println("____________________________________________________________");
+    private static void printAdded(Ui ui, Task task, int count) {
+        ui.showLine();
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + count + " tasks in the list.");
-        System.out.println("____________________________________________________________");
+        ui.showLine();
     }
 }
