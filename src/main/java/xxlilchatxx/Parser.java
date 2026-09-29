@@ -9,7 +9,7 @@ public class Parser {
      * Represents the type of command a user input maps to.
      */
     public enum CommandType {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, FIND, UNKNOWN
     }
 
     /**
@@ -35,6 +35,8 @@ public class Parser {
             return CommandType.DEADLINE;
         } else if (input.equals("event") || input.startsWith("event ")) {
             return CommandType.EVENT;
+        } else if (input.equals("find") || input.startsWith("find ")) {
+            return CommandType.FIND;
         } else {
             return CommandType.UNKNOWN;
         }
@@ -43,7 +45,7 @@ public class Parser {
     /**
      * Extracts the task index from a mark/unmark/delete command.
      *
-     * @param input Raw user input, e.g. "mark 2".
+     * @param input        Raw user input, e.g. "mark 2".
      * @param prefixLength Length of the command word plus trailing space, e.g. 5 for "mark ".
      * @return Zero-based task index.
      * @throws NumberFormatException If the index portion is not a valid number.
@@ -72,9 +74,9 @@ public class Parser {
         String rest = input.length() > 8 ? input.substring(9).trim() : "";
         String[] parts = rest.split(" /by ");
         if (parts.length < 2) {
-            return new String[] { parts.length > 0 ? parts[0] : "", "" };
+            return new String[]{parts.length > 0 ? parts[0] : "", ""};
         }
-        return new String[] { parts[0].trim(), parts[1].trim() };
+        return new String[]{parts[0].trim(), parts[1].trim()};
     }
 
     /**
@@ -87,12 +89,22 @@ public class Parser {
         String rest = input.length() > 5 ? input.substring(6).trim() : "";
         String[] parts = rest.split(" /from ");
         if (parts.length < 2) {
-            return new String[] { parts.length > 0 ? parts[0] : "", "", "" };
+            return new String[]{parts.length > 0 ? parts[0] : "", "", ""};
         }
         String[] timeParts = parts[1].split(" /to ");
         if (timeParts.length < 2) {
-            return new String[] { parts[0].trim(), "", "" };
+            return new String[]{parts[0].trim(), "", ""};
         }
-        return new String[] { parts[0].trim(), timeParts[0].trim(), timeParts[1].trim() };
+        return new String[]{parts[0].trim(), timeParts[0].trim(), timeParts[1].trim()};
+    }
+
+    /**
+     * Extracts the search keyword from a find command.
+     *
+     * @param input Raw user input, e.g. "find book".
+     * @return The keyword to search for, or an empty string if none was given.
+     */
+    public static String parseFindKeyword(String input) {
+        return input.length() > 4 ? input.substring(5).trim() : "";
     }
 }
