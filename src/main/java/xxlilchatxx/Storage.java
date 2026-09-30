@@ -38,14 +38,12 @@ public class Storage {
      * If the file or its containing folder does not exist, no tasks are loaded.
      *
      * @param tasks Array to populate with loaded tasks.
-     * @return Number of tasks successfully loaded.
      */
-    public static int load(ArrayList<Task> tasks) {
-        int count = 0;
+    public static void load(ArrayList<Task> tasks) {
         File file = new File(FILE_PATH);
 
         if (!file.exists()) {
-            return 0;
+            return;
         }
 
         try {
@@ -61,8 +59,6 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Warning: could not load tasks from file.");
         }
-
-        return count;
     }
 
     /**

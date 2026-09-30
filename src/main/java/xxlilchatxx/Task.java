@@ -35,6 +35,11 @@ public class Task {
         isDone = false;
     }
 
+    /**
+     * Returns the description of this task.
+     *
+     * @return The task's description.
+     */
     public String getDescription() {
         return description;
     }
